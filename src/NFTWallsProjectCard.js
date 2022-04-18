@@ -12,7 +12,7 @@ const NFTWallsProjectCard = ({
 	asset_count,
 }) => {
 	return (
-		<Card width="medium" background="light-1">
+		<Card width="60vh" background="light-1">
 			<CardHeader>
 				<Image fit="contain" src={collection_image} />
 			</CardHeader>

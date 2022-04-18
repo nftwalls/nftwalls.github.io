@@ -49,7 +49,7 @@ const NFTWallsCreator = () => {
 					direction="row-responsive"
 					justify="center"
 					pad="xlarge"
-					gap="xlarge"
+					gap="large"
 				>
 					<NFTWallsProjectCard
 						collection_image={selectedProjectInformation.collection_image}
@@ -85,7 +85,7 @@ const NFTWallsCreator = () => {
 								onChange={(event) => setAssetID(event.target.value)}
 							/>
 						</Box>
-						<Box gap="medium" direction="row" justify="end">
+						<Box gap="large" direction="row-responsive" justify="end">
 							{projectOptions[assetProject] === undefined ? (
 								<></>
 							) : projectOptions[assetProject].banner_supported ? (
@@ -100,7 +100,7 @@ const NFTWallsCreator = () => {
 							<Button
 								primary
 								size="large"
-								label={<Text weight="bold">create wall</Text>}
+								label={<Text alignSelf="center" weight="bold">create wall</Text>}
 								color="black"
 								target="_blank"
 								disabled={assetID === "" || assetProject === undefined}
