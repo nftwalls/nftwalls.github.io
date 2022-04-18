@@ -1,7 +1,7 @@
 {
   "name": "nftwalls-ui",
   "version": "0.1.0",
-  "homepage": "https://ujjusinghania.github.io/nftwalls-ui",
+  "homepage": "https://nftwalls.github.io",
   "private": true,
   "dependencies": {
     "@icons-pack/react-simple-icons": "^4.6.1",
