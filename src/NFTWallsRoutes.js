@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Route, HashRouter, Routes, HashRouter } from "react-router-dom";
+import { Route, HashRouter, Routes } from "react-router-dom";
 
 import ReactGA from "react-ga";
 
