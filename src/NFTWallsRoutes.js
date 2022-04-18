@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { Route, BrowserRouter, Routes } from "react-router-dom";
+import { Route, HashRouter, Routes, HashRouter } from "react-router-dom";
 
 import ReactGA from "react-ga";
 
@@ -16,12 +16,12 @@ const NFTWallsRoutes = () => {
 	}, []);
 
 	return (
-		<BrowserRouter>
+		<HashRouter>
 			<Routes>
 				<Route path="/about" element={<NFTWallsAbout />} />
 				<Route path="*" element={<NFTWallsCreator />} />
 			</Routes>
-		</BrowserRouter>
+		</HashRouter>
 	);
 };
 

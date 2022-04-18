@@ -8,10 +8,10 @@ const NFTWallsNavbar = () => {
 		<Header>
 			<Nav direction="row" pad="medium" fill={true} justify="center">
 				<Box pad="small" justify="center">
-					<Anchor size="large" color="black" label="🎨  creator" href="/" />
+					<Anchor size="large" color="black" label="🎨  creator" href="#/" />
 				</Box>
 				<Box pad="small" justify="center">
-					<Anchor size="large" color="black" label="🙋🏻‍♂️ about" href="/about" />
+					<Anchor size="large" color="black" label="🙋🏻‍♂️ about" href="#/about" />
 				</Box>
 				<Box pad="small" justify="end" round="large">
 					<Tip content="Click to copy address">
