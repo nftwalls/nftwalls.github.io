@@ -10,7 +10,10 @@ ssl._create_default_https_context = ssl._create_unverified_context
 
 app = Flask(__name__)
 
-SLIVER_GENERALIZATION = ["paranormiesnft", "doodles-official"]
+SLIVER_GENERALIZATION = ["paranormiesnft", "doodles-official", "foreverbots"]
+LEFT_POINT_GENERALIZATION = ["alphaelementary"]
+
+IMAGE_WIDTH = 1080
 
 SUPPORTED_PROJECTS = {
     "Paranormies": {
@@ -36,15 +39,21 @@ SUPPORTED_PROJECTS = {
     "Kaiju Kingz": {
         "contract_name": "kaiju-kingz"
     },
-    "Deadfrenz Collection": {
-        "contract_name": "deadfrenz-collection"
-    },
     "Deadfellaz Collection": {
         "contract_name": "deadfellaz"
     },
     "Doodles": {
         "contract_name": "doodles-official"
-    }
+    },
+    "Alpha Elementary": {
+        "contract_name": "alphaelementary"
+    },
+    "Invisible Friends": {
+        "contract_name": "invisiblefriends"
+    },
+    "ForeverBots": {
+        "contract_name": "foreverbots"
+    },
 }
 
 BANNER = {
@@ -105,12 +114,15 @@ def get_wallpaper():
             "required_attributes": ["asset_id", "asset_project_name", "banner_needed"]
         }
     else:
-        asset_details = get_asset_name_and_url(asset_id, asset_project_name)
+        asset_url = get_asset_url(asset_id, asset_project_name)
+        nft_image = get_nft_image(asset_url)
 
         if (asset_project_name in SLIVER_GENERALIZATION):
-            background_np_array = create_mobile_wallpaper_with_sliver_generalization(**asset_details)
+            background_np_array = create_mobile_wallpaper_with_sliver_generalization(nft_image)
+        elif (asset_project_name in LEFT_POINT_GENERALIZATION):
+            background_np_array = create_mobile_wallpaper_with_left_point_generalization(nft_image)
         else:
-            background_np_array = create_mobile_wallpaper_with_point_generalization(**asset_details)
+            background_np_array = create_mobile_wallpaper_with_point_generalization(nft_image)
         
         if (banner_needed in [1, "True", "true"]):
             add_banner_to_wallpaper(background_np_array, asset_project_name)
@@ -120,7 +132,7 @@ def get_wallpaper():
         return send_file(background_image_file, mimetype='image/PNG')
 
 
-def get_asset_name_and_url(asset_id, collection_slug):
+def get_asset_url(asset_id, collection_slug):
     url = 'https://api.opensea.io/api/v1/assets?token_ids={0}&order_direction=desc&collection_slug={1}&limit=20&include_orders=false'.format(asset_id, collection_slug)
 
     headers = {
@@ -135,18 +147,39 @@ def get_asset_name_and_url(asset_id, collection_slug):
     asset_name = asset['assets'][0]['name']
     asset_url = asset['assets'][0]['image_original_url']
 
-    return {
-        "asset_name": asset_name, 
-        "asset_url": asset_url 
-        }
+    return asset_url
 
-def create_mobile_wallpaper_with_sliver_generalization(asset_name, asset_url):
+def get_nft_image(asset_url):
     if ('ipfs://' in asset_url):
         asset_url = "https://ipfs.io/ipfs/" + asset_url.split("ipfs://")[1]
 
-    img = Image.open(requests.get(asset_url, stream = True).raw).resize((1080, 1080), Image.ANTIALIAS).convert('RGB')
+    img = Image.open(requests.get(asset_url, stream = True).raw).resize((IMAGE_WIDTH, IMAGE_WIDTH), Image.ANTIALIAS).convert('RGB')
     img = np.array(img)
 
+    return img
+
+def create_mobile_wallpaper_with_left_point_generalization(img):
+    # Adjust opacity of the image to 100%
+    new_img = np.zeros((img.shape[0], img.shape[1], 4))
+    new_img[:, :, :3] = img[:, :, :3]
+    new_img[:, :, 3] = 255
+    
+    # Adjust height based on required image ratio
+    HEIGHT = int(new_img.shape[1] / 9 * 18)
+    BACKGROUND = HEIGHT - new_img.shape[0]
+
+    # Create wallpaper with empty background space and asset
+    wallpaper = np.zeros((HEIGHT, new_img.shape[1], 4))
+    wallpaper[BACKGROUND:, :, :] = new_img
+    
+    point_background = np.mean([new_img[0][i] for i in range(0, 1)], axis=0).astype(int)
+    
+    background_img = np.tile(point_background, (BACKGROUND, new_img.shape[1], 1))
+    wallpaper[:BACKGROUND, :, :] = background_img
+
+    return wallpaper
+
+def create_mobile_wallpaper_with_sliver_generalization(img):
     # Adjust opacity of the image to 100%
     new_img = np.zeros((img.shape[0], img.shape[1], 4))
     new_img[:, :, :3] = img[:, :, :3]
@@ -165,13 +198,7 @@ def create_mobile_wallpaper_with_sliver_generalization(asset_name, asset_url):
 
     return wallpaper
 
-def create_mobile_wallpaper_with_point_generalization(asset_name, asset_url):
-    if ('ipfs://' in asset_url):
-        asset_url = "https://ipfs.io/ipfs/" + asset_url.split("ipfs://")[1]
-
-    img = Image.open(requests.get(asset_url, stream = True).raw).resize((1080, 1080), Image.ANTIALIAS).convert('RGB')
-    img = np.array(img)
-
+def create_mobile_wallpaper_with_point_generalization(img):
     # Adjust opacity of the image to 100%
     new_img = np.zeros((img.shape[0], img.shape[1], 4))
     new_img[:, :, :3] = img[:, :, :3]
@@ -181,16 +208,16 @@ def create_mobile_wallpaper_with_point_generalization(asset_name, asset_url):
     HEIGHT = int(new_img.shape[1] / 9 * 16)
     BACKGROUND = HEIGHT - new_img.shape[0]
     
-    # Create mobile_wallpaper with empty background space and asset
-    mobile_wallpaper = np.zeros((HEIGHT, new_img.shape[1], 4))
-    mobile_wallpaper[BACKGROUND:, :, :] = new_img
+    # Create wallpaper with empty background space and asset
+    wallpaper = np.zeros((HEIGHT, new_img.shape[1], 4))
+    wallpaper[BACKGROUND:, :, :] = new_img
 
-    point_background = np.mean([new_img[0][i] for i in range(0, 1080, 54)], axis=0).astype(int)
+    point_background = np.mean([new_img[0][i] for i in range(0, IMAGE_WIDTH, 54)], axis=0).astype(int)
     
     background_img = np.tile(point_background, (BACKGROUND, new_img.shape[1], 1))
-    mobile_wallpaper[:BACKGROUND, :, :] = background_img
+    wallpaper[:BACKGROUND, :, :] = background_img
 
-    return mobile_wallpaper
+    return wallpaper
 
 def get_image_file_from_numpy(image_np):
     # Creating Image object
